@@ -17,6 +17,12 @@ import Router from 'next/router';
 import { getMapViewFromHash } from '../App/helpers';
 import { osmappLayers } from '../LayerSwitcher/osmappLayers';
 import { fakeStaticExportSkipDefaultMapView } from '../App/fakeStaticExportHelpers';
+import {
+  USER_GEOJSON_STORAGE_KEY,
+  UserGeojsonLayer,
+} from '../../services/userGeojson';
+
+export const ACTIVE_LAYERS_STORAGE_KEY = 'activeLayers';
 
 export type LayerIcon = React.ComponentType<{ fontSize: 'small' }>;
 
@@ -58,6 +64,8 @@ type MapStateContextType = {
   setActiveLayers: Setter<string[]>;
   userLayers: Layer[];
   setUserLayers: Setter<Layer[]>;
+  userGeojsonLayers: UserGeojsonLayer[];
+  setUserGeojsonLayers: Setter<UserGeojsonLayer[]>;
   mapClickOverrideRef: MapClickOverrideRef;
   mapLoaded: boolean;
   setMapLoaded: () => void;
@@ -97,7 +105,7 @@ const useActiveLayersState = () => {
   const initLayers = isClimbing
     ? ['tourist', 'climbing']
     : [DEFAULT_MAP, 'indoor'];
-  return usePersistedState('activeLayers', initLayers);
+  return usePersistedState(ACTIVE_LAYERS_STORAGE_KEY, initLayers);
 };
 
 export const MapStateProvider: React.FC<{ initialMapView: View }> = ({
@@ -112,6 +120,9 @@ export const MapStateProvider: React.FC<{ initialMapView: View }> = ({
     'userLayerIndex',
     [],
   );
+  const [userGeojsonLayers, setUserGeojsonLayers] = usePersistedState<
+    UserGeojsonLayer[]
+  >(USER_GEOJSON_STORAGE_KEY, []);
   const [allActiveLayers, setAllActiveLayers] = useState<Layer[]>([]);
   const mapClickOverrideRef = useRef<MapClickOverride>();
   const [mapLoaded, setMapLoaded, setNotLoaded] = useBoolState(true);
@@ -143,6 +154,8 @@ export const MapStateProvider: React.FC<{ initialMapView: View }> = ({
     setActiveLayers,
     userLayers,
     setUserLayers,
+    userGeojsonLayers,
+    setUserGeojsonLayers,
     mapClickOverrideRef,
     mapLoaded,
     setMapLoaded,
