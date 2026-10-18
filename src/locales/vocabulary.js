@@ -579,6 +579,13 @@ export default {
   'start_photo.add_button': 'Add route start photo',
   'start_photo.hint':
     'Stand about 2 m back and take the first bolt (or the first holds) together with about a metre of rock around it – the rock is what tells neighbouring routes apart.',
+  'start_photo.has_start_photo': 'Has a route start photo',
+  'start_photo.coverage_tooltip': '__withPhoto__ of __total__ routes have a start photo – click to add more',
+  'start_photo.crag_progress': '__withPhoto__ of __total__ routes have a start photo',
+  'start_photo.start': 'Add start photos',
+  'start_photo.continue': 'Continue',
+  'start_photo.next_route': 'Next: __name__',
+  'start_photo.unnamed_route': 'unnamed route',
 
   'opening_hours.all_day': '24 hours',
   'opening_hours.open': 'Open: __todayTime__',

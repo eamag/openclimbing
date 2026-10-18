@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Alert,
   Button,
@@ -20,10 +20,9 @@ import { useFeatureContext } from '../../../../../utils/FeatureContext';
 import { useWikimediaCommonsAuthContext } from '../../../../../utils/WikimediaCommonsAuthContext';
 import { UploadDialogAuthBar } from './UploadDialogAuthBar';
 import { UploadDialogForm } from './UploadDialogForm';
-import { useUploadDialogState } from './useUploadDialogState';
-
-// `start` = the route start photo (wikimedia_commons:start)
-type UploadVariant = 'photo' | 'start';
+import { UploadVariant, useUploadDialogState } from './useUploadDialogState';
+import { FeatureTags } from '../../../../../../services/types';
+import { getStartPhotoFeature } from './getStartPhotoFeature';
 
 type Props = {
   open: boolean;
@@ -31,6 +30,8 @@ type Props = {
   onUploaded: (fileTagValue: string) => void;
   initialFiles?: File[] | null;
   variant?: UploadVariant;
+  /** The edited item – a start photo is named after it, even if it is a route of the opened crag. */
+  item?: { shortId: string; tags: FeatureTags };
 };
 
 const ChooseFileStage: React.FC<{
@@ -232,10 +233,18 @@ export const UploadPhotoDialog: React.FC<Props> = ({
   onUploaded,
   initialFiles,
   variant = 'photo',
+  item,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const { feature } = useFeatureContext();
+  const { feature: contextFeature } = useFeatureContext();
+  const feature = useMemo(
+    () =>
+      variant === 'start' && item && contextFeature
+        ? getStartPhotoFeature(contextFeature, item)
+        : contextFeature,
+    [contextFeature, item, variant],
+  );
   const { loading: authLoading } = useWikimediaCommonsAuthContext();
 
   const state = useUploadDialogState({
@@ -243,6 +252,7 @@ export const UploadPhotoDialog: React.FC<Props> = ({
     feature,
     onUploaded,
     initialFiles,
+    variant,
   });
   const {
     stage,
@@ -288,6 +298,16 @@ export const UploadPhotoDialog: React.FC<Props> = ({
         {variant === 'start'
           ? t('uploaddialog.title_start_photo')
           : t('uploaddialog.title')}
+        {/* when walking along the crag, this says which route to photograph */}
+        {variant === 'start' && feature?.tags?.name && (
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{ display: 'block', color: 'text.secondary' }}
+          >
+            {feature.tags.name}
+          </Typography>
+        )}
         <IconButton
           onClick={onClose}
           disabled={uploading}

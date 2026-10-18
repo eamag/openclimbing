@@ -79,6 +79,7 @@ export const EditDialogUploadHost: React.FC<{
       variant={
         lastTargetSlotKey.current === START_PHOTO_KEY ? 'start' : 'photo'
       }
+      item={currentItem}
     />
   );
 };
